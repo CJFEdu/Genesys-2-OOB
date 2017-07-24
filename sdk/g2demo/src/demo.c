@@ -119,7 +119,8 @@
 
 #include "audio/audio.h"
 #include "dma/dma.h"
-#include "dp/dptx.h"
+//#include "dp/dptx.h"
+#include "dp/dp.h"
 #include "intc/intc.h"
 #include "oled/oled.h"
 #include "userio/userio.h"
@@ -140,7 +141,7 @@ static XAxiDma sAxiDma;
 static XAxiVdma sVdma; //Video DMA
 static XSysMon sXADC;
 static XIntc sIntc;
-static XDptx sSDptx;
+//static XDptx sSDptx;
 static XTmrCtr sSTmr;
 static XSpi sFlashSpi;
 static XTmrCtr sLedTmr;
@@ -181,7 +182,7 @@ const ivt_t ivt[] = {
 	//Flash QSPI Interrupt handler
 	{XPAR_MICROBLAZE_0_AXI_INTC_QSPI_FLASH_IP2INTC_IRPT_INTR, (XInterruptHandler)XSpi_InterruptHandler, &sFlashSpi},
 	//DisplayPort HPD
-	{XPAR_INTC_0_DP_0_VEC_ID, (XInterruptHandler)XDptx_HpdInterruptHandler, &sSDptx},
+//	{XPAR_INTC_0_DP_0_VEC_ID, (XInterruptHandler)XDptx_HpdInterruptHandler, &sSDptx},
 	//LED
 	{XPAR_MICROBLAZE_0_AXI_INTC_LED_TIMER_INTERRUPT_INTR, (XInterruptHandler)fnLedsTimerIntrHandler, &sLedTmr},
 	//ETH_INT_B PHY interrupt
@@ -208,6 +209,8 @@ XStatus main() {
 
 	// Empty assert function. We can put a breakpoint there to look for asserts
 	Xil_AssertSetCallback(Asserted);
+
+	Demo.u8Verbose = TRUE;
 
     // Initialize UART
     XUartNs550_SetBaud(XPAR_AXI_UART16550_0_BASEADDR,
@@ -268,6 +271,7 @@ XStatus main() {
     	return XST_FAILURE;
     }
 
+
 	//Initialize DMA
 	Status = fnConfigDma(&sAxiDma);
 	if(Status != XST_SUCCESS) {
@@ -291,11 +295,12 @@ XStatus main() {
 	}
 
 	// Initialize DP Tx
-	CustomStatus = DptxInit(&sSDptx, XPAR_XDP_0_DEVICE_ID);
+//	CustomStatus = DptxInit(&sSDptx, XPAR_XDP_0_DEVICE_ID);
 
 	// Enable all interrupts in our interrupt vector table
 	// Make sure all driver instances using interrupts are initialized first
 	fnEnableInterrupts(&sIntc, &ivt[0], sizeof(ivt)/sizeof(ivt[0]));
+
 
 	// Setup OLED driver options after interrupts are initialized
 	Status = fnOledDriverOptions(&sOledSpi);
@@ -331,6 +336,7 @@ XStatus main() {
 	//Wait a bit for video sync
 	DemoWaitMs(2000);
 
+
 	// Check the DPTX HPD status after the interrupts are enabled
 	CustomStatus |= Demo.sbLinkFailed;
 	if (CustomStatus != XST_SUCCESS)
@@ -361,8 +367,6 @@ XStatus main() {
 	int temp = 0, vccint = 0, vccaux = 0;
 	int v1=0, v1v5=0, v1v8=0, v3v3=0, v5=0;
 
-	xil_printf ("\r\nStarting Demo");
-
     while(1) {
 
     	u32 dwXADCStatus;
@@ -371,6 +375,18 @@ XStatus main() {
     	xil_printf("----------------------------------------------------------\r\n");
 		xil_printf("Genesys 2 demo application\r\n");
 		xil_printf("----------------------------------------------------------\r\n");
+
+		if(Demo.fVideoEvent) {
+			xil_printf("detected video event:\r\n");
+			// Run the Policy Maker
+			Status = fnDpTest();
+			if(Status == XST_NO_DATA) {
+				xil_printf("Displayport timeout!\r\n");
+			}
+			else xil_printf("success?\r\n");
+			// Reset the video event flag
+			Demo.fVideoEvent = 0;
+		}
 
 		if ((dwXADCStatus = XSysMon_GetStatus(&sXADC)) & XSM_SR_EOS_MASK) {
 			// If XADC reads 0, ignore it
