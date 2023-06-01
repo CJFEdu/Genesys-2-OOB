@@ -1,4 +1,4 @@
--- (c) Copyright 1995-2017 Xilinx, Inc. All rights reserved.
+-- (c) Copyright 1995-2023 Xilinx, Inc. All rights reserved.
 -- 
 -- This file contains confidential and proprietary information
 -- of Xilinx, Inc. and is protected under U.S. and
@@ -46,21 +46,22 @@
 -- 
 -- DO NOT MODIFY THIS FILE.
 
--- IP VLNV: xilinx.com:ip:v_tc:6.1
--- IP Revision: 10
+-- IP VLNV: xilinx.com:ip:v_tc:6.2
+-- IP Revision: 5
 
 LIBRARY ieee;
 USE ieee.std_logic_1164.ALL;
 USE ieee.numeric_std.ALL;
 
-LIBRARY v_tc_v6_1_10;
-USE v_tc_v6_1_10.v_tc;
+LIBRARY v_tc_v6_2_5;
+USE v_tc_v6_2_5.v_tc;
 
 ENTITY system_vtg_0 IS
   PORT (
     clk : IN STD_LOGIC;
     clken : IN STD_LOGIC;
     gen_clken : IN STD_LOGIC;
+    sof_state : IN STD_LOGIC;
     hsync_out : OUT STD_LOGIC;
     hblank_out : OUT STD_LOGIC;
     vsync_out : OUT STD_LOGIC;
@@ -78,6 +79,8 @@ ARCHITECTURE system_vtg_0_arch OF system_vtg_0 IS
     GENERIC (
       C_HAS_AXI4_LITE : INTEGER;
       C_HAS_INTC_IF : INTEGER;
+      C_ARBITRARY_RES_EN : INTEGER;
+      C_VID_PPC : INTEGER;
       C_GEN_INTERLACED : INTEGER;
       C_GEN_HACTIVE_SIZE : INTEGER;
       C_GEN_VACTIVE_SIZE : INTEGER;
@@ -169,6 +172,7 @@ ARCHITECTURE system_vtg_0_arch OF system_vtg_0 IS
       s_axi_aclken : IN STD_LOGIC;
       det_clken : IN STD_LOGIC;
       gen_clken : IN STD_LOGIC;
+      sof_state : IN STD_LOGIC;
       intc_if : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
       field_id_in : IN STD_LOGIC;
       hsync_in : IN STD_LOGIC;
@@ -184,6 +188,12 @@ ARCHITECTURE system_vtg_0_arch OF system_vtg_0 IS
       vblank_out : OUT STD_LOGIC;
       active_video_out : OUT STD_LOGIC;
       active_chroma_out : OUT STD_LOGIC;
+      field_id_out_arb : OUT STD_LOGIC;
+      hsync_out_arb : OUT STD_LOGIC_VECTOR(3 DOWNTO 0);
+      hblank_out_arb : OUT STD_LOGIC_VECTOR(3 DOWNTO 0);
+      active_video_out_arb : OUT STD_LOGIC_VECTOR(3 DOWNTO 0);
+      vsync_out_arb : OUT STD_LOGIC_VECTOR(3 DOWNTO 0);
+      vblank_out_arb : OUT STD_LOGIC_VECTOR(3 DOWNTO 0);
       resetn : IN STD_LOGIC;
       s_axi_aresetn : IN STD_LOGIC;
       s_axi_awaddr : IN STD_LOGIC_VECTOR(8 DOWNTO 0);
@@ -209,19 +219,25 @@ ARCHITECTURE system_vtg_0_arch OF system_vtg_0 IS
     );
   END COMPONENT v_tc;
   ATTRIBUTE X_INTERFACE_INFO : STRING;
-  ATTRIBUTE X_INTERFACE_INFO OF clk: SIGNAL IS "xilinx.com:signal:clock:1.0 clk_intf CLK";
-  ATTRIBUTE X_INTERFACE_INFO OF clken: SIGNAL IS "xilinx.com:signal:clockenable:1.0 clken_intf CE";
-  ATTRIBUTE X_INTERFACE_INFO OF hsync_out: SIGNAL IS "xilinx.com:interface:video_timing:2.0 vtiming_out HSYNC";
-  ATTRIBUTE X_INTERFACE_INFO OF hblank_out: SIGNAL IS "xilinx.com:interface:video_timing:2.0 vtiming_out HBLANK";
-  ATTRIBUTE X_INTERFACE_INFO OF vsync_out: SIGNAL IS "xilinx.com:interface:video_timing:2.0 vtiming_out VSYNC";
-  ATTRIBUTE X_INTERFACE_INFO OF vblank_out: SIGNAL IS "xilinx.com:interface:video_timing:2.0 vtiming_out VBLANK";
+  ATTRIBUTE X_INTERFACE_PARAMETER : STRING;
   ATTRIBUTE X_INTERFACE_INFO OF active_video_out: SIGNAL IS "xilinx.com:interface:video_timing:2.0 vtiming_out ACTIVE_VIDEO";
+  ATTRIBUTE X_INTERFACE_PARAMETER OF clk: SIGNAL IS "XIL_INTERFACENAME clk_intf, ASSOCIATED_BUSIF vtiming_in:vtiming_out, ASSOCIATED_RESET resetn, ASSOCIATED_CLKEN clken, FREQ_HZ 148437500, FREQ_TOLERANCE_HZ 0, PHASE 0.0, CLK_DOMAIN system_mig_7series_0_0_ui_clk, INSERT_VIP 0";
+  ATTRIBUTE X_INTERFACE_INFO OF clk: SIGNAL IS "xilinx.com:signal:clock:1.0 clk_intf CLK";
+  ATTRIBUTE X_INTERFACE_PARAMETER OF clken: SIGNAL IS "XIL_INTERFACENAME clken_intf, POLARITY ACTIVE_HIGH";
+  ATTRIBUTE X_INTERFACE_INFO OF clken: SIGNAL IS "xilinx.com:signal:clockenable:1.0 clken_intf CE";
+  ATTRIBUTE X_INTERFACE_INFO OF hblank_out: SIGNAL IS "xilinx.com:interface:video_timing:2.0 vtiming_out HBLANK";
+  ATTRIBUTE X_INTERFACE_INFO OF hsync_out: SIGNAL IS "xilinx.com:interface:video_timing:2.0 vtiming_out HSYNC";
+  ATTRIBUTE X_INTERFACE_PARAMETER OF resetn: SIGNAL IS "XIL_INTERFACENAME resetn_intf, POLARITY ACTIVE_LOW, INSERT_VIP 0";
   ATTRIBUTE X_INTERFACE_INFO OF resetn: SIGNAL IS "xilinx.com:signal:reset:1.0 resetn_intf RST";
+  ATTRIBUTE X_INTERFACE_INFO OF vblank_out: SIGNAL IS "xilinx.com:interface:video_timing:2.0 vtiming_out VBLANK";
+  ATTRIBUTE X_INTERFACE_INFO OF vsync_out: SIGNAL IS "xilinx.com:interface:video_timing:2.0 vtiming_out VSYNC";
 BEGIN
   U0 : v_tc
     GENERIC MAP (
       C_HAS_AXI4_LITE => 0,
       C_HAS_INTC_IF => 0,
+      C_ARBITRARY_RES_EN => 0,
+      C_VID_PPC => 4,
       C_GEN_INTERLACED => 0,
       C_GEN_HACTIVE_SIZE => 1920,
       C_GEN_VACTIVE_SIZE => 1080,
@@ -239,18 +255,18 @@ BEGIN
       C_GEN_F1_VFRAME_SIZE => 1125,
       C_GEN_HSYNC_START => 2008,
       C_GEN_HSYNC_END => 2052,
-      C_GEN_F0_VBLANK_HSTART => 1920,
-      C_GEN_F0_VBLANK_HEND => 1920,
+      C_GEN_F0_VBLANK_HSTART => 2008,
+      C_GEN_F0_VBLANK_HEND => 2008,
       C_GEN_F0_VSYNC_VSTART => 1083,
       C_GEN_F0_VSYNC_VEND => 1088,
-      C_GEN_F0_VSYNC_HSTART => 1920,
-      C_GEN_F0_VSYNC_HEND => 1920,
-      C_GEN_F1_VBLANK_HSTART => 1920,
-      C_GEN_F1_VBLANK_HEND => 1920,
+      C_GEN_F0_VSYNC_HSTART => 2008,
+      C_GEN_F0_VSYNC_HEND => 2008,
+      C_GEN_F1_VBLANK_HSTART => 2008,
+      C_GEN_F1_VBLANK_HEND => 2008,
       C_GEN_F1_VSYNC_VSTART => 1083,
       C_GEN_F1_VSYNC_VEND => 1088,
-      C_GEN_F1_VSYNC_HSTART => 1920,
-      C_GEN_F1_VSYNC_HEND => 1920,
+      C_GEN_F1_VSYNC_HSTART => 2008,
+      C_GEN_F1_VSYNC_HEND => 2008,
       C_FSYNC_HSTART0 => 0,
       C_FSYNC_VSTART0 => 0,
       C_FSYNC_HSTART1 => 0,
@@ -313,6 +329,7 @@ BEGIN
       s_axi_aclken => '1',
       det_clken => '1',
       gen_clken => gen_clken,
+      sof_state => sof_state,
       field_id_in => '0',
       hsync_in => '0',
       hblank_in => '0',

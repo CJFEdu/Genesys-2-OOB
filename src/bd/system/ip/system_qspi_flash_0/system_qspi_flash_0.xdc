@@ -44,26 +44,17 @@
 # 
 # THIS COPYRIGHT NOTICE AND DISCLAIMER MUST BE RETAINED AS
 # PART OF THIS FILE AT ALL TIMES.
-set_false_path -to [get_pins -hier *cdc_to*/D]
-set_false_path -to [get_pins -hierarchical -filter {NAME =~*RESET_SYNC_AXI_SPI_CLK_INST/RESET_SYNC_AX2S_1/D}]
-set_false_path -to [get_pins -hierarchical -filter {NAME =~*QSPI_CORE_INTERFACE_I/FIFO_EXISTS.CLK_CROSS_I/LOGIC_GENERATION_CDC.SPISEL_PULSE_S2AX_1_CDC/D}]
-# Set false path on the reset synchronizers
-set_false_path -from [get_cells -hierarchical -filter {NAME =~*_FIFO_II/USE_2N_DEPTH.V6_S6_AND_LATER.I_ASYNC_FIFO_BRAM/*rstblk*/*rst_reg_reg[*]}]
-set_false_path -to [get_pins -hierarchical -filter {NAME =~*_FIFO_II/USE_2N_DEPTH.V6_S6_AND_LATER.I_ASYNC_FIFO_BRAM/*rstblk*/*PRE}]
-##set_false_path -to [get_pins -hierarchical -filter {NAME =~*/*rstblk*/*CLR}]
+#set_false_path -to [get_pins -hier *cdc_to*/D]
+set_false_path -to [get_pins -of [get_cells -hier -filter {NAME =~*cdc_to*}] -filter {REF_PIN_NAME =~D}] 
+#set_false_path -to [get_pins -hierarchical -filter {NAME =~*RESET_SYNC_AXI_SPI_CLK_INST/RESET_SYNC_AX2S_1/D}]
+set_false_path -to [get_pins -of [get_cells -hier -filter {NAME =~*RESET_SYNC_AXI_SPI_CLK_INST/RESET_SYNC_AX2S_1}] -filter {REF_PIN_NAME =~D}]
+#set_false_path -to [get_pins -hierarchical -filter {NAME =~*QSPI_CORE_INTERFACE_I/FIFO_EXISTS.CLK_CROSS_I/LOGIC_GENERATION_CDC.SPISEL_PULSE_S2AX_1_CDC/D}]
+set_false_path -to [get_pins -of [get_cells -hier -filter {NAME =~*QSPI_CORE_INTERFACE_I/FIFO_EXISTS.CLK_CROSS_I/LOGIC_GENERATION_CDC.SPISEL_PULSE_S2AX_1_CDC}] -filter {REF_PIN_NAME ==D}] 
+#set_false_path -to [get_pins -of [get_cells -hier -filter {NAME =~*QSPI_CORE_INTERFACE_I/FIFO_EXISTS.CLK_CROSS_I/LOGIC_GENERATION_FDR.*SPISEL_PULSE_S2AX_1_CDC}] -filter {REF_PIN_NAME ==D}] 
+#set_false_path -to [get_pins -of [get_cells -hier -filter {NAME =~*QSPI_CORE_INTERFACE_I/RX_FIFO_II/gnuram_async_fifo.xpm_fifo_base_inst/gen_cdc_pntr.wr_pntr_cdc_inst/dest_graysync_ff_reg*}] -filter {REF_PIN_NAME ==D}] 
 
 ## IOB constraints ######
 set_property IOB true [get_cells -hierarchical -filter {NAME =~*IO*_I_REG}]
-
-
-
-
-
-
-
-
-
-
 
 #####################################################################################################
 # The following section list the board specific constraints (with/without STARTUPE2/E3 primitive)   #
@@ -107,7 +98,8 @@ set_property IOB true [get_cells -hierarchical -filter {NAME =~*IO*_I_REG}]
 
 #### Following command creates a divide by 2 clock
 #### It also takes into account the delay added by STARTUP block to route the CCLK
-##create_generated_clock -name clk_sck -source [get_pins -hierarchical *axi_quad_spi_1/ext_spi_clk] [get_pins -hierarchical *USRCCLKO] -edges {3 5 7} -edge_shift [list $cclk_delay $cclk_delay $cclk_delay]
+####create_generated_clock -name clk_sck -source [get_pins -hierarchical *axi_quad_spi_1/ext_spi_clk] [get_pins -hierarchical *USRCCLKO] -edges {3 5 7} -edge_shift [list $cclk_delay $cclk_delay $cclk_delay]
+##create_generated_clock -name clk_sck -source [get_pins -filter {REF_PIN_NAME==ext_spi_clk} -of [get_cells -hier -filter {REF_NAME=~axi_quad_spi_0}]] [get_pins -hierarchical *USRCCLKO] -edges {3 5 7} -edge_shift [list $cclk_delay $cclk_delay $cclk_delay]
 
 #### Data is captured into FPGA on the second rising edge of ext_spi_clk after the SCK falling edge
 #### Data is driven by the FPGA on every alternate rising_edge of ext_spi_clk
@@ -122,4 +114,3 @@ set_property IOB true [get_cells -hierarchical -filter {NAME =~*IO*_I_REG}]
 ##set_output_delay -clock clk_sck -min [expr $tdata_trace_delay_min -$th - $tclk_trace_delay_max] [get_ports IO*_IO];
 ##set_multicycle_path 2 -setup -start -from [get_clocks -of_objects [get_pins -hierarchical */ext_spi_clk]] -to clk_sck
 ##set_multicycle_path 1 -hold -from [get_clocks -of_objects [get_pins -hierarchical */ext_spi_clk]] -to clk_sck
-

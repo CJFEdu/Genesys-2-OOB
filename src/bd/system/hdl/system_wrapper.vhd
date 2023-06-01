@@ -1,8 +1,8 @@
---Copyright 1986-2016 Xilinx, Inc. All Rights Reserved.
+--Copyright 1986-2022 Xilinx, Inc. All Rights Reserved.
 ----------------------------------------------------------------------------------
---Tool Version: Vivado v.2016.4 (win64) Build 1733598 Wed Dec 14 22:35:39 MST 2016
---Date        : Fri Mar 17 16:01:08 2017
---Host        : WK117 running 64-bit major release  (build 9200)
+--Tool Version: Vivado v.2022.2 (win64) Build 3671981 Fri Oct 14 05:00:03 MDT 2022
+--Date        : Thu Jun  1 00:03:07 2023
+--Host        : LAPTOP-TVFDO2QR running 64-bit major release  (build 9200)
 --Command     : generate_target system_wrapper.bd
 --Design      : system_wrapper
 --Purpose     : IP block netlist
@@ -55,17 +55,11 @@ entity system_wrapper is
     eth_intb : in STD_LOGIC;
     fan_en : out STD_LOGIC;
     hdmi_rx_hpa : out STD_LOGIC_VECTOR ( 0 to 0 );
-    hdmi_tx_clk_n : out STD_LOGIC;
-    hdmi_tx_clk_p : out STD_LOGIC;
-    hdmi_tx_data_n : out STD_LOGIC_VECTOR ( 2 downto 0 );
-    hdmi_tx_data_p : out STD_LOGIC_VECTOR ( 2 downto 0 );
     led : out STD_LOGIC_VECTOR ( 7 downto 0 );
-    mdio_io_mdc : out STD_LOGIC;
-    mdio_io_mdio_io : inout STD_LOGIC;
     oled_gpio : out STD_LOGIC_VECTOR ( 3 downto 0 );
     oled_sclk : out STD_LOGIC;
     oled_sdin : out STD_LOGIC;
-    phy_rst_n : out STD_LOGIC;
+    phy_rst_n : out STD_LOGIC_VECTOR ( 0 to 0 );
     power_iic_scl_io : inout STD_LOGIC;
     power_iic_sda_io : inout STD_LOGIC;
     ps2_clk : inout STD_LOGIC;
@@ -112,10 +106,6 @@ architecture STRUCTURE of system_wrapper is
     DDR3_cs_n : out STD_LOGIC_VECTOR ( 0 to 0 );
     DDR3_dm : out STD_LOGIC_VECTOR ( 3 downto 0 );
     DDR3_odt : out STD_LOGIC_VECTOR ( 0 to 0 );
-    mdio_io_mdc : out STD_LOGIC;
-    mdio_io_mdio_i : in STD_LOGIC;
-    mdio_io_mdio_o : out STD_LOGIC;
-    mdio_io_mdio_t : out STD_LOGIC;
     power_iic_scl_i : in STD_LOGIC;
     power_iic_scl_o : out STD_LOGIC;
     power_iic_scl_t : out STD_LOGIC;
@@ -148,7 +138,7 @@ architecture STRUCTURE of system_wrapper is
     AUD_ADC_SDATA : in STD_LOGIC;
     ps2_clk : inout STD_LOGIC;
     ps2_data : inout STD_LOGIC;
-    phy_rst_n : out STD_LOGIC;
+    phy_rst_n : out STD_LOGIC_VECTOR ( 0 to 0 );
     oled_gpio : out STD_LOGIC_VECTOR ( 3 downto 0 );
     oled_sdin : out STD_LOGIC;
     oled_sclk : out STD_LOGIC;
@@ -183,12 +173,8 @@ architecture STRUCTURE of system_wrapper is
     vga_r : out STD_LOGIC_VECTOR ( 4 downto 0 );
     vga_vs : out STD_LOGIC;
     fan_en : out STD_LOGIC;
-    AUD_ADDR_0 : out STD_LOGIC_VECTOR ( 0 to 0 );
     AUD_ADDR_1 : out STD_LOGIC_VECTOR ( 0 to 0 );
-    hdmi_tx_clk_p : out STD_LOGIC;
-    hdmi_tx_clk_n : out STD_LOGIC;
-    hdmi_tx_data_p : out STD_LOGIC_VECTOR ( 2 downto 0 );
-    hdmi_tx_data_n : out STD_LOGIC_VECTOR ( 2 downto 0 );
+    AUD_ADDR_0 : out STD_LOGIC_VECTOR ( 0 to 0 );
     aud_scl_i : in STD_LOGIC;
     aud_scl_o : out STD_LOGIC;
     aud_scl_t : out STD_LOGIC;
@@ -211,9 +197,6 @@ architecture STRUCTURE of system_wrapper is
   signal aud_sda_i : STD_LOGIC;
   signal aud_sda_o : STD_LOGIC;
   signal aud_sda_t : STD_LOGIC;
-  signal mdio_io_mdio_i : STD_LOGIC;
-  signal mdio_io_mdio_o : STD_LOGIC;
-  signal mdio_io_mdio_t : STD_LOGIC;
   signal power_iic_scl_i : STD_LOGIC;
   signal power_iic_scl_o : STD_LOGIC;
   signal power_iic_scl_t : STD_LOGIC;
@@ -250,13 +233,6 @@ aud_sda_iobuf: component IOBUF
       IO => aud_sda_io,
       O => aud_sda_i,
       T => aud_sda_t
-    );
-mdio_io_mdio_iobuf: component IOBUF
-     port map (
-      I => mdio_io_mdio_o,
-      IO => mdio_io_mdio_io,
-      O => mdio_io_mdio_i,
-      T => mdio_io_mdio_t
     );
 power_iic_scl_iobuf: component IOBUF
      port map (
@@ -355,19 +331,11 @@ system_i: component system
       eth_intb => eth_intb,
       fan_en => fan_en,
       hdmi_rx_hpa(0) => hdmi_rx_hpa(0),
-      hdmi_tx_clk_n => hdmi_tx_clk_n,
-      hdmi_tx_clk_p => hdmi_tx_clk_p,
-      hdmi_tx_data_n(2 downto 0) => hdmi_tx_data_n(2 downto 0),
-      hdmi_tx_data_p(2 downto 0) => hdmi_tx_data_p(2 downto 0),
       led(7 downto 0) => led(7 downto 0),
-      mdio_io_mdc => mdio_io_mdc,
-      mdio_io_mdio_i => mdio_io_mdio_i,
-      mdio_io_mdio_o => mdio_io_mdio_o,
-      mdio_io_mdio_t => mdio_io_mdio_t,
       oled_gpio(3 downto 0) => oled_gpio(3 downto 0),
       oled_sclk => oled_sclk,
       oled_sdin => oled_sdin,
-      phy_rst_n => phy_rst_n,
+      phy_rst_n(0) => phy_rst_n(0),
       power_iic_scl_i => power_iic_scl_i,
       power_iic_scl_o => power_iic_scl_o,
       power_iic_scl_t => power_iic_scl_t,

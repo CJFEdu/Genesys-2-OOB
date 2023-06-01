@@ -1,4 +1,4 @@
-// (c) Copyright 1995-2017 Xilinx, Inc. All rights reserved.
+// (c) Copyright 1995-2023 Xilinx, Inc. All rights reserved.
 // 
 // This file contains confidential and proprietary information
 // of Xilinx, Inc. and is protected under U.S. and
@@ -48,7 +48,7 @@
 
 
 // IP VLNV: xilinx.com:ip:v_axi4s_vid_out:4.0
-// IP Revision: 5
+// IP Revision: 15
 
 `timescale 1ns/1ps
 
@@ -81,13 +81,18 @@ module system_v_axi4s_vid_out_0_0 (
   locked,
   overflow,
   underflow,
-  status
+  fifo_read_level,
+  status,
+  sof_state_out
 );
 
+(* X_INTERFACE_PARAMETER = "XIL_INTERFACENAME aclk_intf, ASSOCIATED_BUSIF video_in, FREQ_HZ 148437500, FREQ_TOLERANCE_HZ 0, PHASE 0.0, CLK_DOMAIN system_mig_7series_0_0_ui_clk, INSERT_VIP 0" *)
 (* X_INTERFACE_INFO = "xilinx.com:signal:clock:1.0 aclk_intf CLK" *)
 input wire aclk;
+(* X_INTERFACE_PARAMETER = "XIL_INTERFACENAME aclken_intf, POLARITY ACTIVE_HIGH" *)
 (* X_INTERFACE_INFO = "xilinx.com:signal:clockenable:1.0 aclken_intf CE" *)
 input wire aclken;
+(* X_INTERFACE_PARAMETER = "XIL_INTERFACENAME aresetn_intf, POLARITY ACTIVE_LOW, INSERT_VIP 0" *)
 (* X_INTERFACE_INFO = "xilinx.com:signal:reset:1.0 aresetn_intf RST" *)
 input wire aresetn;
 (* X_INTERFACE_INFO = "xilinx.com:interface:axis:1.0 video_in TDATA" *)
@@ -98,9 +103,11 @@ input wire s_axis_video_tvalid;
 output wire s_axis_video_tready;
 (* X_INTERFACE_INFO = "xilinx.com:interface:axis:1.0 video_in TUSER" *)
 input wire s_axis_video_tuser;
+(* X_INTERFACE_PARAMETER = "XIL_INTERFACENAME video_in, TDATA_NUM_BYTES 3, TDEST_WIDTH 0, TID_WIDTH 0, TUSER_WIDTH 1, HAS_TREADY 1, HAS_TSTRB 0, HAS_TKEEP 0, HAS_TLAST 1, FREQ_HZ 148437500, PHASE 0.0, CLK_DOMAIN system_mig_7series_0_0_ui_clk, LAYERED_METADATA undef, INSERT_VIP 0" *)
 (* X_INTERFACE_INFO = "xilinx.com:interface:axis:1.0 video_in TLAST" *)
 input wire s_axis_video_tlast;
 input wire fid;
+(* X_INTERFACE_PARAMETER = "XIL_INTERFACENAME vid_io_out_ce_intf, POLARITY ACTIVE_HIGH" *)
 (* X_INTERFACE_INFO = "xilinx.com:signal:clockenable:1.0 vid_io_out_ce_intf CE" *)
 input wire vid_io_out_ce;
 (* X_INTERFACE_INFO = "xilinx.com:interface:vid_io:1.0 vid_io_out ACTIVE_VIDEO" *)
@@ -133,9 +140,11 @@ output wire vtg_ce;
 output wire locked;
 output wire overflow;
 output wire underflow;
+output wire [10 : 0] fifo_read_level;
 output wire [31 : 0] status;
+output wire sof_state_out;
 
-  v_axi4s_vid_out_v4_0_5 #(
+  v_axi4s_vid_out_v4_0_15 #(
     .C_FAMILY("kintex7"),
     .C_PIXELS_PER_CLOCK(1),
     .C_COMPONENTS_PER_PIXEL(3),
@@ -147,7 +156,11 @@ output wire [31 : 0] status;
     .C_ADDR_WIDTH(10),
     .C_VTG_MASTER_SLAVE(1),
     .C_HYSTERESIS_LEVEL(12),
-    .C_SYNC_LOCK_THRESHOLD(4)
+    .C_SYNC_LOCK_THRESHOLD(4),
+    .C_INCLUDE_PIXEL_REPEAT(0),
+    .C_INCLUDE_PIXEL_REMAP_420(0),
+    .C_ADDR_WIDTH_PIXEL_REMAP_420(10),
+    .C_ARBITRARY_RES_EN(0)
   ) inst (
     .aclk(aclk),
     .aclken(aclken),
@@ -168,6 +181,11 @@ output wire [31 : 0] status;
     .vid_hblank(vid_hblank),
     .vid_field_id(vid_field_id),
     .vid_data(vid_data),
+    .vid_vsync_arb(),
+    .vid_hsync_arb(),
+    .vid_active_video_arb(),
+    .vid_field_id_arb(),
+    .vid_data_arb(),
     .vtg_vsync(vtg_vsync),
     .vtg_hsync(vtg_hsync),
     .vtg_vblank(vtg_vblank),
@@ -175,9 +193,20 @@ output wire [31 : 0] status;
     .vtg_active_video(vtg_active_video),
     .vtg_field_id(vtg_field_id),
     .vtg_ce(vtg_ce),
+    .vtg_hsync_arb(1'B0),
+    .vtg_hblank_arb(1'B0),
+    .vtg_vsync_arb(1'B0),
+    .vtg_vblank_arb(1'B0),
+    .vtg_active_video_arb(1'B0),
+    .vtg_field_id_arb(1'B0),
+    .video_format(2'B0),
     .locked(locked),
     .overflow(overflow),
     .underflow(underflow),
-    .status(status)
+    .fifo_read_level(fifo_read_level),
+    .status(status),
+    .sof_state_out(sof_state_out),
+    .repeat_en(1'B0),
+    .remap_420_en(1'B0)
   );
 endmodule

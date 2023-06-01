@@ -52,7 +52,7 @@
 //----------------------------------------------
 // Includes
 //----------------------------------------------
-`include "displayport_v7_0_3_tx_defs.v"
+`include "displayport_v9_0_5_tx_defs.v"
 
 //----------------------------------------------
 // module declaration
@@ -1349,4 +1349,4 @@ module system_displayport_0_0_tx_phy
 
 
 
-endmodule  // displayport_v7_0_3_tx_phy
+endmodule  // displayport_v9_0_5_tx_phy

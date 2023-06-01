@@ -63,6 +63,7 @@ module system_displayport_0_0_dport_wrapper
   parameter  C_FLOW_DIRECTION         = 1,
   parameter  C_PHY_TYPE_EXTERNAL      = 1,
   parameter  C_INCLUDE_HDCP           = 0,
+  parameter  C_INCLUDE_HDCP22         = 0,
   parameter  C_SECONDARY_SUPPORT      = 0,
   parameter  C_IEEE_OUI               = "000A35",
   parameter  C_AUDIO_CHANNELS         = 8,
@@ -81,7 +82,12 @@ module system_displayport_0_0_dport_wrapper
   parameter  C_GT_DATAWIDTH           = 2,
   parameter  C_BUF_BYPASS             = 0,
   parameter  C_EDP_EN                 = 0,
-  parameter  C_SIM_MODE               = 0
+  parameter  C_IS_VERSAL              = 0,
+  parameter  C_SIM_MODE               = 0,
+  parameter  C_INCLUDE_FEC_PORTS      = 0,
+  parameter  C_FEC_ENCODER_DELAY      = 0,
+  parameter  EGW_IS_PARENT_IP         = 1,
+  parameter  C_ENABLE_DSC             = 0
 )
 (
    input  wire                    s_axi_aclk           , // group DP_S_AXILITE
@@ -197,9 +203,10 @@ module system_displayport_0_0_dport_wrapper
    output wire [11:0]             lnk_tx_axi4s_lane0_tuser        , // DISPMODE,DISPVAL,CHARISK - each per byte
    output wire                    lnk_tx_axi4s_lane0_tvalid       , 
    input  wire                    lnk_tx_axi4s_lane0_tready       , 
-   input  wire [7:0]                   lnk_tx_sb_status_axi4s_tdata,
-   input  wire                         lnk_tx_sb_status_axi4s_tvalid,
-   output wire                         lnk_tx_sb_status_axi4s_tready,
+   //input  wire [8 -1:0]  lnk_tx_sb_status_axi4s_tdata,
+   input  wire [7:0]              lnk_tx_sb_status_axi4s_tdata,
+   input  wire                    lnk_tx_sb_status_axi4s_tvalid,
+   output wire                    lnk_tx_sb_status_axi4s_tready,
 
    output wire [31:0]             lnk_tx_axi4s_lane1_tdata        ,
    output wire [11:0]             lnk_tx_axi4s_lane1_tuser        ,
@@ -227,16 +234,17 @@ module system_displayport_0_0_dport_wrapper
 
    // new outputs for Tx Subsystem
 
+   output wire [31:0]  tx_gt_ctrl_out,
    output wire [2:0]   tx_bpc,
-   output wire [1:0]   tx_video_format,
+   output wire [2:0]   tx_video_format,
    output wire [2:0]   tx_ppc,
    input  wire [31:0]             txss_axi_status,
    output wire [31:0]             txss_axi_control,
-   output wire [1:0]   tx_video_format_stream2,
+   output wire [2:0]   tx_video_format_stream2,
    output wire [2:0]   tx_ppc_stream2,
-   output wire [1:0]   tx_video_format_stream3,
+   output wire [2:0]   tx_video_format_stream3,
    output wire [2:0]   tx_ppc_stream3,
-   output wire [1:0]   tx_video_format_stream4,
+   output wire [2:0]   tx_video_format_stream4,
    output wire [2:0]   tx_ppc_stream4,
    input  wire                    rx_vid_clk           , // group VIDEO_IF
    input  wire                    rx_vid_rst           , // group VIDEO_IF
@@ -245,6 +253,10 @@ module system_displayport_0_0_dport_wrapper
    output wire                    rx_vid_hsync         , // group VIDEO_IF
    output wire                    rx_vid_oddeven       , // group VIDEO_IF
    output wire                    rx_vid_enable        , // group VIDEO_IF
+   output wire                    rx_enable_dsc        , 
+   output wire    [2:0]           rx_num_active_lanes  , 
+   output wire    [11:0]          rx_vid_valid_per_pixel  , 
+   output wire                    rx_vid_last          , 
    output wire    [47:0]          rx_vid_pixel0        , // group VIDEO_IF
    output wire    [47:0]          rx_vid_pixel1        , // group VIDEO_IF
    output wire    [47:0]          rx_vid_pixel2        , // group VIDEO_IF
@@ -380,6 +392,7 @@ module system_displayport_0_0_dport_wrapper
    output wire                    hdcp_ingress_tready  ,
    input  wire                    hdcp_ingress_tvalid  ,
 
+   output wire [31:0]             rx_gt_ctrl_out       ,
    output wire [2:0]              rx_bpc               ,
    output wire [2:0]              rx_bpc_stream2       ,
    output wire [2:0]              rx_bpc_stream3       ,
@@ -387,10 +400,55 @@ module system_displayport_0_0_dport_wrapper
    output wire [2:0]              rx_cformat           ,
    output wire [2:0]              rx_cformat_stream2   ,
    output wire [2:0]              rx_cformat_stream3   ,
-   output wire [2:0]              rx_cformat_stream4   
+   output wire [2:0]              rx_cformat_stream4   , 
+   
+   output wire                      fec_tx_clken            ,
+   output wire                      fec_tx_reset            ,
+   output wire [1:0]                fec_tx_num_lanes        ,
+   output wire [1:0]                fec_tx_valid_in         ,
+   output wire [7:0]                fec_tx_data_ll_enc_in   ,
+   output wire [7:0]                fec_tx_data_ph_in       ,
+   output wire [63:0]               fec_tx_data_in          ,
+   output wire [7:0]                fec_tx_data_k_in        ,
+   input wire [63:0]                fec_tx_data_out         ,
+   input wire [7:0]                 fec_tx_data_k_out       ,
+   input  wire [7:0]                fec_tx_val_out          ,
+   input  wire [7:0]                fec_data_rd_ovr_out     ,
+   input  wire [7:0]                fec_data_rd_val_out     , 
+   output wire [15:0]               axi_tran_per_horiz_line ,
+   output wire [15:0]               vtg_hactive             ,
+   output wire                      tx_enable_dsc           ,
+   //output wire [511:0]              debug_bus_main_lnk      ,
+   //output wire [511:0]              debug_bus_main_vid      ,
+   
+   output wire                      fec_rx_clken            ,
+   output wire                      fec_rx_reset            ,
+   output wire [1:0]                fec_rx_valid_in         ,
+   output wire [79:0]               fec_rx_data_in          ,
+   output wire                      fec_rx_enable_in        ,
+   output wire [1:0]                fec_rx_num_lanes        ,
+   input wire [63:0]                fec_rx_data_out         ,
+   input wire [7:0]                 fec_rx_data_k_out       ,
+   input wire                       fec_rx_val_out          ,
+   input wire [7:0]                 fec_rx_pm_out           ,
+   input wire [7:0]                 fec_rx_ph_out           ,
+   output wire [314:0]              dsc_rx_debug_bus_vid    ,
+   output wire [49:0]               dsc_rx_debug_bus_lnk    ,
+
+    // PPS AXI-4 Stream IF
+    output wire [31:0]            m_axis_rx_pps_tdata,   
+    output wire                   m_axis_rx_pps_tvalid,
+    output wire                   m_axis_rx_pps_tuser,   
+    output wire                   m_axis_rx_pps_tlast,   
+    input  wire                   m_axis_rx_pps_tready,  
+
+   // ACR (Audio Clock Regeneration) Interface
+   output wire [23:0]             acr_m_aud, 
+   output wire [23:0]             acr_n_aud, 
+   output wire                    acr_valid
 
 );
-
+     localparam C_MST_ENABLE_T    = 0;
   system_displayport_0_0_support #(
      .C_FAMILY                 (  C_FAMILY                ),
      .C_COMPONENT_NAME         (  C_COMPONENT_NAME        ),
@@ -405,7 +463,7 @@ module system_displayport_0_0_dport_wrapper
      .C_S_HIGHADDR             (  C_S_HIGHADDR            ),
      .C_PROTOCOL_SELECTION     (  C_PROTOCOL_SELECTION    ),
      .C_LINK_RATE              (  C_LINK_RATE             ),
-     .C_MST_ENABLE             (  C_MST_ENABLE            ),
+     .C_MST_ENABLE             (  C_MST_ENABLE_T          ),
      .C_NUMBER_OF_MST_STREAMS  (  C_NUMBER_OF_MST_STREAMS ),
      .C_MAX_BITS_PER_COLOR     (  C_MAX_BITS_PER_COLOR    ),
      .C_QUAD_PIXEL_ENABLE      (  C_QUAD_PIXEL_ENABLE     ),
@@ -415,7 +473,8 @@ module system_displayport_0_0_dport_wrapper
      .C_VENDOR_SPECIFIC        (  C_VENDOR_SPECIFIC       ),
      .C_DATA_WIDTH             (  C_GT_DATAWIDTH          ),
      .C_EDP_EN                 (  C_EDP_EN                ), 
-     .C_SIM_MODE                (  C_SIM_MODE               ) 
+     .C_IS_VERSAL              (  C_IS_VERSAL             ), 
+     .C_SIM_MODE               (  C_SIM_MODE              ) 
 
   ) support_inst
   (
@@ -503,6 +562,7 @@ module system_displayport_0_0_dport_wrapper
       .aux_tx_channel_in_p                  (aux_tx_channel_in_p),
       .aux_tx_channel_in_n                  (aux_tx_channel_in_n),
      .tx_hpd              ( tx_hpd        ) ,
+     .tx_gt_ctrl_out                        (tx_gt_ctrl_out),
      .tx_bpc                                (tx_bpc),
      .tx_video_format                       (tx_video_format),
      .tx_ppc                                (tx_ppc),
@@ -614,6 +674,7 @@ module system_displayport_0_0_dport_wrapper
      .hdcp_ingress_tready ( hdcp_ingress_tready ),
      .hdcp_ingress_tvalid ( hdcp_ingress_tvalid ),
 
+     .rx_gt_ctrl_out       (rx_gt_ctrl_out      ),
      .rx_bpc               (rx_bpc              ),
      .rx_bpc_stream2       (rx_bpc_stream2      ),
      .rx_bpc_stream3       (rx_bpc_stream3      ),

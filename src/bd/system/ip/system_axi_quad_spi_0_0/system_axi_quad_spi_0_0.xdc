@@ -44,23 +44,9 @@
 # 
 # THIS COPYRIGHT NOTICE AND DISCLAIMER MUST BE RETAINED AS
 # PART OF THIS FILE AT ALL TIMES.
-# Set false path on the reset synchronizers
-set_false_path -from [get_cells -hierarchical -filter {NAME =~*_FIFO_II/USE_2N_DEPTH.V6_S6_AND_LATER.I_ASYNC_FIFO_BRAM/*rstblk*/*rst_reg_reg[*]}]
-set_false_path -to [get_pins -hierarchical -filter {NAME =~*_FIFO_II/USE_2N_DEPTH.V6_S6_AND_LATER.I_ASYNC_FIFO_BRAM/*rstblk*/*PRE}]
-##set_false_path -to [get_pins -hierarchical -filter {NAME =~*/*rstblk*/*CLR}]
 
 ## IOB constraints ######
 set_property IOB true [get_cells -hierarchical -filter {NAME =~*IO*_I_REG}]
-
-
-
-
-
-
-
-
-
-
 
 #####################################################################################################
 # The following section list the board specific constraints (with/without STARTUPE2/E3 primitive)   #
@@ -95,7 +81,8 @@ set_property IOB true [get_cells -hierarchical -filter {NAME =~*IO*_I_REG}]
 ##set tclk_trace_delay_min 0.2
 
 ##### End of user provided delay numbers
-##create_generated_clock -name clk_sck -source [get_pins -hierarchical *axi_quad_spi_1/ext_spi_clk] [get_ports <SCK_IO>] -edges {3 5 7}
+####create_generated_clock -name clk_sck -source [get_pins -hierarchical *axi_quad_spi_1/ext_spi_clk] [get_ports <SCK_IO>] -edges {3 5 7}
+##create_generated_clock -name clk_sck -source [get_pins -filter {REF_PIN_NAME==ext_spi_clk} -of [get_cells -hier -filter {REF_NAME=~axi_quad_spi_0}]] [get_ports SCK_IO] -edges {3 5 7}
 
 #### Data is captured into FPGA on the second rising edge of ext_spi_clk after the SCK falling edge
 #### Data is driven by the FPGA on every alternate rising_edge of ext_spi_clk
@@ -110,4 +97,3 @@ set_property IOB true [get_cells -hierarchical -filter {NAME =~*IO*_I_REG}]
 ##set_output_delay -clock clk_sck -min [expr $tdata_trace_delay_min - $th - $tclk_trace_delay_max] [get_ports IO*_IO];
 ##set_multicycle_path 2 -setup -start -from [get_clocks -of_objects [get_pins -hierarchical */ext_spi_clk]] -to clk_sck
 ##set_multicycle_path 1 -hold -from [get_clocks -of_objects [get_pins -hierarchical */ext_spi_clk]] -to clk_sck
-

@@ -56,7 +56,7 @@
 //  Output     Output      Phase    Duty Cycle   Pk-to-Pk     Phase
 //   Clock     Freq (MHz)  (degrees)    (%)     Jitter (ps)  Error (ps)
 //----------------------------------------------------------------------------
-// clk_out1___150.000______0.000______50.0______127.220____105.461
+// clk_out1__150.00000______0.000______50.0______127.220____105.461
 //
 //----------------------------------------------------------------------------
 // Input Clock   Freq (MHz)    Input Jitter (UI)
@@ -80,6 +80,8 @@ module system_qspi_flash_clk_gen_0_clk_wiz
 wire clk_in1_system_qspi_flash_clk_gen_0;
 wire clk_in2_system_qspi_flash_clk_gen_0;
   assign clk_in1_system_qspi_flash_clk_gen_0 = clk_in1;
+
+
 
 
   // Clocking PRIMITIVE
@@ -117,13 +119,14 @@ wire clk_in2_system_qspi_flash_clk_gen_0;
   PLLE2_ADV
   #(.BANDWIDTH            ("OPTIMIZED"),
     .COMPENSATION         ("ZHOLD"),
+    .STARTUP_WAIT         ("FALSE"),
     .DIVCLK_DIVIDE        (1),
     .CLKFBOUT_MULT        (9),
     .CLKFBOUT_PHASE       (0.000),
     .CLKOUT0_DIVIDE       (6),
     .CLKOUT0_PHASE        (0.000),
     .CLKOUT0_DUTY_CYCLE   (0.500),
-    .CLKIN1_PERIOD        (10.0))
+    .CLKIN1_PERIOD        (10.000))
   plle2_adv_inst
     // Output clocks
    (
@@ -163,6 +166,9 @@ wire clk_in2_system_qspi_flash_clk_gen_0;
   BUFG clkf_buf
    (.O (clkfbout_buf_system_qspi_flash_clk_gen_0),
     .I (clkfbout_system_qspi_flash_clk_gen_0));
+
+
+
 
 
 

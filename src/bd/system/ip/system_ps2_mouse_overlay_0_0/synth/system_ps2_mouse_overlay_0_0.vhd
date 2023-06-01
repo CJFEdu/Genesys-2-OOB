@@ -1,4 +1,4 @@
--- (c) Copyright 1995-2017 Xilinx, Inc. All rights reserved.
+-- (c) Copyright 1995-2023 Xilinx, Inc. All rights reserved.
 -- 
 -- This file contains confidential and proprietary information
 -- of Xilinx, Inc. and is protected under U.S. and
@@ -138,41 +138,48 @@ ARCHITECTURE system_ps2_mouse_overlay_0_0_arch OF system_ps2_mouse_overlay_0_0 I
     );
   END COMPONENT ps2_mouse_overlay_v1_0;
   ATTRIBUTE X_CORE_INFO : STRING;
-  ATTRIBUTE X_CORE_INFO OF system_ps2_mouse_overlay_0_0_arch: ARCHITECTURE IS "ps2_mouse_overlay_v1_0,Vivado 2016.4";
+  ATTRIBUTE X_CORE_INFO OF system_ps2_mouse_overlay_0_0_arch: ARCHITECTURE IS "ps2_mouse_overlay_v1_0,Vivado 2022.2";
   ATTRIBUTE CHECK_LICENSE_TYPE : STRING;
   ATTRIBUTE CHECK_LICENSE_TYPE OF system_ps2_mouse_overlay_0_0_arch : ARCHITECTURE IS "system_ps2_mouse_overlay_0_0,ps2_mouse_overlay_v1_0,{}";
   ATTRIBUTE X_INTERFACE_INFO : STRING;
+  ATTRIBUTE X_INTERFACE_PARAMETER : STRING;
+  ATTRIBUTE X_INTERFACE_PARAMETER OF PixelClk: SIGNAL IS "XIL_INTERFACENAME vid_clk, ASSOCIATED_BUSIF vid_i:vid_o, FREQ_HZ 148437500, PHASE 0.0, CLK_DOMAIN system_mig_7series_0_0_ui_clk";
   ATTRIBUTE X_INTERFACE_INFO OF PixelClk: SIGNAL IS "xilinx.com:signal:clock:1.0 vid_clk CLK";
+  ATTRIBUTE X_INTERFACE_PARAMETER OF pClkEn: SIGNAL IS "XIL_INTERFACENAME vid_clk_en, FREQ_HZ 100000000, PHASE 0, POLARITY ACTIVE_LOW";
   ATTRIBUTE X_INTERFACE_INFO OF pClkEn: SIGNAL IS "xilinx.com:signal:clockenable:1.0 vid_clk_en CE";
-  ATTRIBUTE X_INTERFACE_INFO OF pVde_in: SIGNAL IS "xilinx.com:interface:vid_io:1.0 vid_i ACTIVE_VIDEO";
-  ATTRIBUTE X_INTERFACE_INFO OF pHSync_in: SIGNAL IS "xilinx.com:interface:vid_io:1.0 vid_i HSYNC";
-  ATTRIBUTE X_INTERFACE_INFO OF pVSync_in: SIGNAL IS "xilinx.com:interface:vid_io:1.0 vid_i VSYNC";
   ATTRIBUTE X_INTERFACE_INFO OF pData_in: SIGNAL IS "xilinx.com:interface:vid_io:1.0 vid_i DATA";
-  ATTRIBUTE X_INTERFACE_INFO OF pVde_out: SIGNAL IS "xilinx.com:interface:vid_io:1.0 vid_o ACTIVE_VIDEO";
-  ATTRIBUTE X_INTERFACE_INFO OF pHSync_out: SIGNAL IS "xilinx.com:interface:vid_io:1.0 vid_o HSYNC";
-  ATTRIBUTE X_INTERFACE_INFO OF pVSync_out: SIGNAL IS "xilinx.com:interface:vid_io:1.0 vid_o VSYNC";
   ATTRIBUTE X_INTERFACE_INFO OF pData_out: SIGNAL IS "xilinx.com:interface:vid_io:1.0 vid_o DATA";
+  ATTRIBUTE X_INTERFACE_INFO OF pHSync_in: SIGNAL IS "xilinx.com:interface:vid_io:1.0 vid_i HSYNC";
+  ATTRIBUTE X_INTERFACE_INFO OF pHSync_out: SIGNAL IS "xilinx.com:interface:vid_io:1.0 vid_o HSYNC";
+  ATTRIBUTE X_INTERFACE_INFO OF pVSync_in: SIGNAL IS "xilinx.com:interface:vid_io:1.0 vid_i VSYNC";
+  ATTRIBUTE X_INTERFACE_INFO OF pVSync_out: SIGNAL IS "xilinx.com:interface:vid_io:1.0 vid_o VSYNC";
+  ATTRIBUTE X_INTERFACE_INFO OF pVde_in: SIGNAL IS "xilinx.com:interface:vid_io:1.0 vid_i ACTIVE_VIDEO";
+  ATTRIBUTE X_INTERFACE_INFO OF pVde_out: SIGNAL IS "xilinx.com:interface:vid_io:1.0 vid_o ACTIVE_VIDEO";
+  ATTRIBUTE X_INTERFACE_PARAMETER OF s00_axi_aclk: SIGNAL IS "XIL_INTERFACENAME ctrl_signal_clock, ASSOCIATED_BUSIF ctrl, ASSOCIATED_RESET s00_axi_aresetn, FREQ_HZ 100000000, PHASE 0, CLK_DOMAIN system_mig_7series_0_0_ui_clk";
   ATTRIBUTE X_INTERFACE_INFO OF s00_axi_aclk: SIGNAL IS "xilinx.com:signal:clock:1.0 ctrl_signal_clock CLK";
+  ATTRIBUTE X_INTERFACE_INFO OF s00_axi_araddr: SIGNAL IS "xilinx.com:interface:aximm:1.0 ctrl ARADDR";
+  ATTRIBUTE X_INTERFACE_PARAMETER OF s00_axi_aresetn: SIGNAL IS "XIL_INTERFACENAME ctrl_axi_signal_reset, POLARITY ACTIVE_LOW";
   ATTRIBUTE X_INTERFACE_INFO OF s00_axi_aresetn: SIGNAL IS "xilinx.com:signal:reset:1.0 ctrl_axi_signal_reset RST";
+  ATTRIBUTE X_INTERFACE_INFO OF s00_axi_arprot: SIGNAL IS "xilinx.com:interface:aximm:1.0 ctrl ARPROT";
+  ATTRIBUTE X_INTERFACE_INFO OF s00_axi_arready: SIGNAL IS "xilinx.com:interface:aximm:1.0 ctrl ARREADY";
+  ATTRIBUTE X_INTERFACE_INFO OF s00_axi_arvalid: SIGNAL IS "xilinx.com:interface:aximm:1.0 ctrl ARVALID";
+  ATTRIBUTE X_INTERFACE_PARAMETER OF s00_axi_awaddr: SIGNAL IS "XIL_INTERFACENAME ctrl, DATA_WIDTH 32, PROTOCOL AXI4LITE, FREQ_HZ 100000000, ID_WIDTH 0, ADDR_WIDTH 4, AWUSER_WIDTH 0, ARUSER_WIDTH 0, WUSER_WIDTH 0, RUSER_WIDTH 0, BUSER_WIDTH 0, READ_WRITE_MODE READ_WRITE, HAS_BURST 0, HAS_LOCK 0, HAS_PROT 1, HAS_CACHE 0, HAS_QOS 0, HAS_REGION 0, HAS_WSTRB 1, HAS_BRESP 1, HAS_RRESP 1, SUPPORTS_NARROW_BURST 0, NUM_READ_OUTSTANDING 2, NUM_WRITE_OUTSTANDING 2, MAX_BURST_LENGTH 1, PHASE 0, CLK_DOMAIN system_mig_7series_0_0_ui_clk, NUM_READ_THREADS 1, NUM_WRITE_THR" & 
+"EADS 1, RUSER_BITS_PER_BYTE 0, WUSER_BITS_PER_BYTE 0";
   ATTRIBUTE X_INTERFACE_INFO OF s00_axi_awaddr: SIGNAL IS "xilinx.com:interface:aximm:1.0 ctrl AWADDR";
   ATTRIBUTE X_INTERFACE_INFO OF s00_axi_awprot: SIGNAL IS "xilinx.com:interface:aximm:1.0 ctrl AWPROT";
-  ATTRIBUTE X_INTERFACE_INFO OF s00_axi_awvalid: SIGNAL IS "xilinx.com:interface:aximm:1.0 ctrl AWVALID";
   ATTRIBUTE X_INTERFACE_INFO OF s00_axi_awready: SIGNAL IS "xilinx.com:interface:aximm:1.0 ctrl AWREADY";
-  ATTRIBUTE X_INTERFACE_INFO OF s00_axi_wdata: SIGNAL IS "xilinx.com:interface:aximm:1.0 ctrl WDATA";
-  ATTRIBUTE X_INTERFACE_INFO OF s00_axi_wstrb: SIGNAL IS "xilinx.com:interface:aximm:1.0 ctrl WSTRB";
-  ATTRIBUTE X_INTERFACE_INFO OF s00_axi_wvalid: SIGNAL IS "xilinx.com:interface:aximm:1.0 ctrl WVALID";
-  ATTRIBUTE X_INTERFACE_INFO OF s00_axi_wready: SIGNAL IS "xilinx.com:interface:aximm:1.0 ctrl WREADY";
+  ATTRIBUTE X_INTERFACE_INFO OF s00_axi_awvalid: SIGNAL IS "xilinx.com:interface:aximm:1.0 ctrl AWVALID";
+  ATTRIBUTE X_INTERFACE_INFO OF s00_axi_bready: SIGNAL IS "xilinx.com:interface:aximm:1.0 ctrl BREADY";
   ATTRIBUTE X_INTERFACE_INFO OF s00_axi_bresp: SIGNAL IS "xilinx.com:interface:aximm:1.0 ctrl BRESP";
   ATTRIBUTE X_INTERFACE_INFO OF s00_axi_bvalid: SIGNAL IS "xilinx.com:interface:aximm:1.0 ctrl BVALID";
-  ATTRIBUTE X_INTERFACE_INFO OF s00_axi_bready: SIGNAL IS "xilinx.com:interface:aximm:1.0 ctrl BREADY";
-  ATTRIBUTE X_INTERFACE_INFO OF s00_axi_araddr: SIGNAL IS "xilinx.com:interface:aximm:1.0 ctrl ARADDR";
-  ATTRIBUTE X_INTERFACE_INFO OF s00_axi_arprot: SIGNAL IS "xilinx.com:interface:aximm:1.0 ctrl ARPROT";
-  ATTRIBUTE X_INTERFACE_INFO OF s00_axi_arvalid: SIGNAL IS "xilinx.com:interface:aximm:1.0 ctrl ARVALID";
-  ATTRIBUTE X_INTERFACE_INFO OF s00_axi_arready: SIGNAL IS "xilinx.com:interface:aximm:1.0 ctrl ARREADY";
   ATTRIBUTE X_INTERFACE_INFO OF s00_axi_rdata: SIGNAL IS "xilinx.com:interface:aximm:1.0 ctrl RDATA";
+  ATTRIBUTE X_INTERFACE_INFO OF s00_axi_rready: SIGNAL IS "xilinx.com:interface:aximm:1.0 ctrl RREADY";
   ATTRIBUTE X_INTERFACE_INFO OF s00_axi_rresp: SIGNAL IS "xilinx.com:interface:aximm:1.0 ctrl RRESP";
   ATTRIBUTE X_INTERFACE_INFO OF s00_axi_rvalid: SIGNAL IS "xilinx.com:interface:aximm:1.0 ctrl RVALID";
-  ATTRIBUTE X_INTERFACE_INFO OF s00_axi_rready: SIGNAL IS "xilinx.com:interface:aximm:1.0 ctrl RREADY";
+  ATTRIBUTE X_INTERFACE_INFO OF s00_axi_wdata: SIGNAL IS "xilinx.com:interface:aximm:1.0 ctrl WDATA";
+  ATTRIBUTE X_INTERFACE_INFO OF s00_axi_wready: SIGNAL IS "xilinx.com:interface:aximm:1.0 ctrl WREADY";
+  ATTRIBUTE X_INTERFACE_INFO OF s00_axi_wstrb: SIGNAL IS "xilinx.com:interface:aximm:1.0 ctrl WSTRB";
+  ATTRIBUTE X_INTERFACE_INFO OF s00_axi_wvalid: SIGNAL IS "xilinx.com:interface:aximm:1.0 ctrl WVALID";
 BEGIN
   U0 : ps2_mouse_overlay_v1_0
     GENERIC MAP (

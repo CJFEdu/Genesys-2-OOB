@@ -66,3 +66,4 @@ create_clock -name vid_clk        -period 6.6   [get_ports tx_vid_clk]
 
 
 
+

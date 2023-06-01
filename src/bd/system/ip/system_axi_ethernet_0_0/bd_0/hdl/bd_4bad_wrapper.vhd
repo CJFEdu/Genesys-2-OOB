@@ -1,11 +1,8 @@
---Copyright 1986-2016 Xilinx, Inc. All Rights Reserved.
+--Copyright 1986-2022 Xilinx, Inc. All Rights Reserved.
 ----------------------------------------------------------------------------------
---Tool Version: Vivado v.2016.4 (win64) Build 1733598 Wed Dec 14 22:35:39 MST 2016
---Date        : Fri Mar 17 16:01:14 2017
---Host        : WK117 running 64-bit major release  (build 9200)
---Command     : generate_target bd_4bad_wrapper.bd
---Design      : bd_4bad_wrapper
---Purpose     : IP block netlist
+--Command: generate_target bd_4bad_wrapper.bd
+--Design : bd_4bad_wrapper
+--Purpose: IP block netlist
 ----------------------------------------------------------------------------------
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
@@ -35,7 +32,7 @@ entity bd_4bad_wrapper is
     mac_irq : out STD_LOGIC;
     mdio_mdc : out STD_LOGIC;
     mdio_mdio_io : inout STD_LOGIC;
-    phy_rst_n : out STD_LOGIC;
+    phy_rst_n : out STD_LOGIC_VECTOR ( 0 to 0 );
     ref_clk : in STD_LOGIC;
     rgmii_rd : in STD_LOGIC_VECTOR ( 3 downto 0 );
     rgmii_rx_ctl : in STD_LOGIC;
@@ -78,6 +75,20 @@ end bd_4bad_wrapper;
 architecture STRUCTURE of bd_4bad_wrapper is
   component bd_4bad is
   port (
+    s_axi_lite_resetn : in STD_LOGIC;
+    s_axi_lite_clk : in STD_LOGIC;
+    mac_irq : out STD_LOGIC;
+    axis_clk : in STD_LOGIC;
+    axi_txd_arstn : in STD_LOGIC;
+    axi_txc_arstn : in STD_LOGIC;
+    axi_rxd_arstn : in STD_LOGIC;
+    axi_rxs_arstn : in STD_LOGIC;
+    interrupt : out STD_LOGIC;
+    gtx_clk : in STD_LOGIC;
+    phy_rst_n : out STD_LOGIC_VECTOR ( 0 to 0 );
+    ref_clk : in STD_LOGIC;
+    gtx_clk90_out : out STD_LOGIC;
+    gtx_clk_out : out STD_LOGIC;
     s_axi_araddr : in STD_LOGIC_VECTOR ( 17 downto 0 );
     s_axi_arready : out STD_LOGIC;
     s_axi_arvalid : in STD_LOGIC;
@@ -95,16 +106,16 @@ architecture STRUCTURE of bd_4bad_wrapper is
     s_axi_wready : out STD_LOGIC;
     s_axi_wstrb : in STD_LOGIC_VECTOR ( 3 downto 0 );
     s_axi_wvalid : in STD_LOGIC;
-    s_axis_txd_tdata : in STD_LOGIC_VECTOR ( 31 downto 0 );
-    s_axis_txd_tkeep : in STD_LOGIC_VECTOR ( 3 downto 0 );
-    s_axis_txd_tlast : in STD_LOGIC;
-    s_axis_txd_tready : out STD_LOGIC;
-    s_axis_txd_tvalid : in STD_LOGIC;
     s_axis_txc_tdata : in STD_LOGIC_VECTOR ( 31 downto 0 );
     s_axis_txc_tkeep : in STD_LOGIC_VECTOR ( 3 downto 0 );
     s_axis_txc_tlast : in STD_LOGIC;
     s_axis_txc_tready : out STD_LOGIC;
     s_axis_txc_tvalid : in STD_LOGIC;
+    s_axis_txd_tdata : in STD_LOGIC_VECTOR ( 31 downto 0 );
+    s_axis_txd_tkeep : in STD_LOGIC_VECTOR ( 3 downto 0 );
+    s_axis_txd_tlast : in STD_LOGIC;
+    s_axis_txd_tready : out STD_LOGIC;
+    s_axis_txd_tvalid : in STD_LOGIC;
     m_axis_rxd_tdata : out STD_LOGIC_VECTOR ( 31 downto 0 );
     m_axis_rxd_tkeep : out STD_LOGIC_VECTOR ( 3 downto 0 );
     m_axis_rxd_tlast : out STD_LOGIC;
@@ -115,30 +126,16 @@ architecture STRUCTURE of bd_4bad_wrapper is
     m_axis_rxs_tlast : out STD_LOGIC;
     m_axis_rxs_tready : in STD_LOGIC;
     m_axis_rxs_tvalid : out STD_LOGIC;
-    mdio_mdc : out STD_LOGIC;
-    mdio_mdio_i : in STD_LOGIC;
-    mdio_mdio_o : out STD_LOGIC;
-    mdio_mdio_t : out STD_LOGIC;
     rgmii_rd : in STD_LOGIC_VECTOR ( 3 downto 0 );
     rgmii_rx_ctl : in STD_LOGIC;
     rgmii_rxc : in STD_LOGIC;
     rgmii_td : out STD_LOGIC_VECTOR ( 3 downto 0 );
     rgmii_tx_ctl : out STD_LOGIC;
     rgmii_txc : out STD_LOGIC;
-    s_axi_lite_resetn : in STD_LOGIC;
-    axi_rxs_arstn : in STD_LOGIC;
-    axi_rxd_arstn : in STD_LOGIC;
-    axi_txc_arstn : in STD_LOGIC;
-    axi_txd_arstn : in STD_LOGIC;
-    s_axi_lite_clk : in STD_LOGIC;
-    axis_clk : in STD_LOGIC;
-    interrupt : out STD_LOGIC;
-    mac_irq : out STD_LOGIC;
-    phy_rst_n : out STD_LOGIC;
-    gtx_clk : in STD_LOGIC;
-    gtx_clk_out : out STD_LOGIC;
-    gtx_clk90_out : out STD_LOGIC;
-    ref_clk : in STD_LOGIC
+    mdio_mdc : out STD_LOGIC;
+    mdio_mdio_i : in STD_LOGIC;
+    mdio_mdio_o : out STD_LOGIC;
+    mdio_mdio_t : out STD_LOGIC
   );
   end component bd_4bad;
   component IOBUF is
@@ -179,7 +176,7 @@ bd_4bad_i: component bd_4bad
       mdio_mdio_i => mdio_mdio_i,
       mdio_mdio_o => mdio_mdio_o,
       mdio_mdio_t => mdio_mdio_t,
-      phy_rst_n => phy_rst_n,
+      phy_rst_n(0) => phy_rst_n(0),
       ref_clk => ref_clk,
       rgmii_rd(3 downto 0) => rgmii_rd(3 downto 0),
       rgmii_rx_ctl => rgmii_rx_ctl,

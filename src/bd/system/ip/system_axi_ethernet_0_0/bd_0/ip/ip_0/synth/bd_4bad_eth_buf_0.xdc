@@ -71,7 +71,8 @@ set_false_path -to [get_pins -hier -regexp {.*/data_sync0_i/D}]
 
 # Ignore paths to the asynchronous reset port of the reset synchronization module
 # -------------------------------------------------------------------------------
-set_false_path -to [get_pins -hier -filter {NAME =~ */async_rst*/PRE}]
+#set_false_path -to [get_pins -hier -filter {NAME =~ */async_rst*/PRE}]
+set_false_path -to [get_pins -of [get_cells -hierarchical -filter {NAME =~ *async_rst*}] -filter {REF_PIN_NAME =~ PRE}]
 
 # Rx data path CDC crossing
 # -------------------------
@@ -96,3 +97,5 @@ set_false_path -through [get_nets -hier -regexp {.*speed_is_10_100.*} ]
 
 
 
+######### Waivers ###########
+create_waiver -internal -scope -quiet -type CDC -id {CDC-10} -user "axi_ethernet_buffer" -tags "11999" -desc "The CDC-10 warning is waived as it is on the reset path which is level signal. This is safe to ignore." -from [get_pins -of [get_cells -hier -filter {name =~ */ClkA_reset_inst/sync_rst1_reg*}] -filter {name =~ *C}] -to [get_pins -of [get_cells -hier -filter {name =~ */ClkB_reset_inst/async_rst0_reg*}] -filter {name =~ *PRE}]
