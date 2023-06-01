@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <projectDescription>
 	<name>g2demo</name>
-	<comment></comment>
+	<comment>Created by SDK v2015.4. g2demo_bsp - microblaze_0</comment>
 	<projects>
 		<project>g2demo_bsp</project>
 	</projects>

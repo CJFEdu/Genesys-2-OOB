@@ -197,7 +197,6 @@ XStatus VideoInit(XAxiVdma* psVdma, XSpi* psQspi)
 
 	{ // Read demo still from QSPI
 		u32 addr = READ_ADDRESS_BASE - READ_WRITE_EXTRA_BYTES;
-		u32 x, y;
 		XStatus status;
 		xil_printf("\n\rLoading display image (this might take a while)... ");
 		status = SpiFlashReadInPlace(psQspi, IMAGE_FLASH_BASE_ADDR, 1920*1080*(24/8), (u8*)(addr));
